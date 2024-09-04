@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instagram Spam Detection</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        input {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+        }
+        button {
+            padding: 10px 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .result {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Instagram Spam Detection</h1>
+        <form id="prediction-form">
+            <div class="form-group">
+                <label for="profile_pic">Profile Picture (1 or 0):</label>
+                <input type="number" id="profile_pic" name="profile_pic" required>
+            </div>
+            <div class="form-group">
+                <label for="num_by_num">Number in Username Ratio:</label>
+                <input type="number" step="0.01" id="num_by_num" name="num_by_num" required>
+            </div>
+            <div class="form-group">
+                <label for="full_name">Full Name Length:</label>
+                <input type="number" id="full_name" name="full_name" required>
+            </div>
+            <div class="form-group">
+                <label for="num_by_char">Number in Full Name Ratio:</label>
+                <input type="number" step="0.01" id="num_by_char" name="num_by_char" required>
+            </div>
+            <div class="form-group">
+                <label for="name_username">Full Name Matches Username (1 or 0):</label>
+                <input type="number" id="name_username" name="name_username" required>
+            </div>
+            <div class="form-group">
+                <label for="bio_len">Biography Length:</label>
+                <input type="number" id="bio_len" name="bio_len" required>
+            </div>
+            <div class="form-group">
+                <label for="url">External URL Present (1 or 0):</label>
+                <input type="number" id="url" name="url" required>
+            </div>
+            <div class="form-group">
+                <label for="private">Profile Private (1 or 0):</label>
+                <input type="number" id="private" name="private" required>
+            </div>
+            <div class="form-group">
+                <label for="post">Number of Posts:</label>
+                <input type="number" id="post" name="post" required>
+            </div>
+            <div class="form-group">
+                <label for="followers">Number of Followers:</label>
+                <input type="number" id="followers" name="followers" required>
+            </div>
+            <div class="form-group">
+                <label for="follows">Number of Followees:</label>
+                <input type="number" id="follows" name="follows" required>
+            </div>
+            <button type="submit">Predict</button>
+        </form>
+        <div class="result" id="result" style="display:none;">
+            <h2>Prediction:</h2>
+            <p id="prediction"></p>
+            <p id="probability"></p>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('prediction-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const formData = new FormData(this);
+            const data = {};
+            formData.forEach((value, key) => {
+                data[key] = value;
+            });
+
+            fetch('/predict', {
+                method: 'POST',
+                body: new URLSearchParams(data),
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('result').style.display = 'block';
+                document.getElementById('prediction').textContent = `Result: ${data.result}`;
+                document.getElementById('probability').textContent = `Probability: ${data.probability}`;
+            })
+            .catch(error => console.error('Error:', error));
+        });
+    </script>
+</body>
+</html>
